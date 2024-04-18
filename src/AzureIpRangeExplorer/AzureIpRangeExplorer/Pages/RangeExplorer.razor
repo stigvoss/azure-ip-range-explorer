@@ -1,0 +1,95 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+
+<PageTitle>Azure IP Range Explorer</PageTitle>
+
+<h1>Azure IP Range Explorer</h1>
+
+<p>View Azure IP ranges of Azure by region and service:</p>
+
+<div class="mb-3">
+    <label for="region" class="form-label">Region:</label>
+    <select @bind="SelectedRegion" class="form-select" id="region">
+        @foreach(string region in Regions)
+        {
+            <option value="@region">@region</option>
+        }
+    </select>
+</div>
+
+<div class="mb-3">
+    <label for="service" class="form-label">Service:</label>
+    <select @bind="SelectedService" class="form-select" id="service">
+        @foreach(string service in Services)
+        {
+            <option value="@service">@service</option>
+        }
+    </select>
+</div>
+
+@if (ranges == null)
+{
+    <p>
+        <em>Loading...</em>
+    </p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Service</th>
+            <th>Region</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var serviceRange in ranges.Values.Where(serviceRange 
+                      => serviceRange.Properties.Region == SelectedRegion
+                      && serviceRange.Properties.SystemService == SelectedService))
+        {
+            <tr>
+                <td>@serviceRange.Properties.SystemService</td>
+                <td>@serviceRange.Properties.Region</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                @foreach (string addressPrefix in serviceRange.Properties.AddressPrefixes)
+                {
+                    @addressPrefix<br />
+                }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private string currentVersion = "20240415";
+    
+    private AzureIpRanges? ranges;
+    
+    private IEnumerable<string> Regions => ranges?.Values.Select(range => range.Properties.Region).Distinct() ?? Enumerable.Empty<string>();
+
+    private string? SelectedRegion { get; set; }
+    
+    private string[] Services => ranges?.Values.Select(range => range.Properties.SystemService).Distinct().ToArray() ?? Array.Empty<string>();
+    
+    private string? SelectedService { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        Uri? uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        
+        
+        ranges = await Http.GetFromJsonAsync<AzureIpRanges>($"azure-ranges/ServiceTags_Public_{currentVersion}.json");
+    }
+
+    public record AzureIpRanges(int ChangeNumber, string Cloud, AzureServiceRange[] Values);
+
+    public record AzureServiceRange(string Name, AzureServiceRangeProperties Properties);
+
+    public record AzureServiceRangeProperties(string Region, string[] AddressPrefixes, string SystemService);
+
+}
