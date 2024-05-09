@@ -22,6 +22,8 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+    - name: Current directory
+      run: echo $PWD
     - name: Restore dependencies
       run: dotnet restore $SOLUTION
     - name: Build
