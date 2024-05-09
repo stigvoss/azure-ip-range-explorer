@@ -18,10 +18,6 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-  
-env:
-  SOLUTION: src/AzureIpRangeExplorer/
-  PUBLISH: publish/
 
 jobs:
   build:
@@ -33,14 +29,13 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore $SOLUTION
+      run: dotnet restore src/AzureIpRangeExplorer/
     - name: Build
-      run: dotnet publish $SOLUTION --no-restore -o $PUBLISH
+      run: dotnet publish src/AzureIpRangeExplorer/ --no-restore -o publish/
     - name: Upload artifact
-      # Automatically uploads an artifact from the './_site' directory by default
       uses: actions/upload-pages-artifact@v2
       with:
-        path: ${PUBLISH}wwwroot/
+        path: publish/wwwroot/
 
   
   # Deployment job
