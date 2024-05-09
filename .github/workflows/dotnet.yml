@@ -23,7 +23,9 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Current directory
-      run: echo $PWD
+      run: |
+        echo $PWD
+        ls -lhA
     - name: Restore dependencies
       run: dotnet restore $SOLUTION
     - name: Build
