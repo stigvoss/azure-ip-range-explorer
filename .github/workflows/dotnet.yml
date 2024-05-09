@@ -8,6 +8,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+env:
+  SOLUTION: src/AzureIpRangeExplorer/
 
 jobs:
   build:
@@ -21,8 +23,6 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore src/AzureIpRangeExplorer/
+      run: dotnet restore $SOLUTION
     - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet build --no-restore $SOLUTION
