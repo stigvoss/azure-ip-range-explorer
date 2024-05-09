@@ -21,6 +21,7 @@ concurrency:
   
 env:
   SOLUTION: src/AzureIpRangeExplorer/
+  PUBLISH: publish/
 
 jobs:
   build:
@@ -31,19 +32,15 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
-    - name: Current directory
-      run: |
-        echo $PWD
-        ls -lhA
     - name: Restore dependencies
       run: dotnet restore $SOLUTION
     - name: Build
-      run: dotnet publish $SOLUTION --no-restore -o publish/
+      run: dotnet publish $SOLUTION --no-restore -o $PUBLISH
     - name: Upload artifact
       # Automatically uploads an artifact from the './_site' directory by default
       uses: actions/upload-pages-artifact@v2
       with:
-        path: publish/wwwroot/
+        path: ${PUBLISH}wwwroot/
 
   
   # Deployment job
