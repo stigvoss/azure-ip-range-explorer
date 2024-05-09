@@ -38,10 +38,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore $SOLUTION
     - name: Build
-      run: dotnet publish $SOLUTION --no-restore -o ./_site
+      run: dotnet publish $SOLUTION --no-restore -o publish/
     - name: Upload artifact
       # Automatically uploads an artifact from the './_site' directory by default
       uses: actions/upload-pages-artifact@v2
+      with:
+        path: publish/wwwroot/
 
   
   # Deployment job
